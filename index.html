@@ -1,184 +1,268 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<style>
-	#canvas{
-		border:2px solid orange ;
-	}
-	</style>
-	
-	
-	<script src="jquery-3.2.0.min.js"></script>
-</head>
-<body>
-	<button id="canvas2png">Canvas 2 PNG</button>
-    <canvas id="canvas" width="800" height="800"></canvas>
-    
-    
-    
-
-    <script src="fabric.js"></script>
-    <script>
-		document.onkeydown = function(e) {return on_keyboard_action(e); }
-document.onkeyup = function(e) {return on_keyboardup_action(e); }
-
-var canvas = document.getElementById("canvas");
-var ctx = canvas.getContext("2d");
-var ctrl_pressed = false;
-
-function on_keyboard_action(event){
-    k = event.keyCode;  
-    //ctrl
-   	if(k==17){
-			if(ctrl_pressed == false)
-				ctrl_pressed = true;
-			if (!window.Clipboard)
-				pasteCatcher.focus();
-			}
-    }
-function on_keyboardup_action(event){
-	//ctrl
-	if(k==17)
-		ctrl_pressed = false;
-    }
+    <head>
+        <style>
+            #canvas{
+                border:2px solid orange ;
+            }
+        </style>
 
 
-//=== Clipboard ================================================================
+        <script src="jquery-3.2.0.min.js"></script>
+    </head>
+    <body>
 
-//firefox
-var pasteCatcher;
-if (!window.Clipboard){
-	pasteCatcher = document.createElement("div");
-	pasteCatcher.setAttribute("id", "paste_ff");
-	pasteCatcher.setAttribute("contenteditable", "");
-	pasteCatcher.style.cssText = 'opacity:0;position:fixed;top:0px;left:0px;';
-	pasteCatcher.style.marginLeft = "-20px";
-	document.body.appendChild(pasteCatcher);
-	pasteCatcher.focus();
-	document.addEventListener("click", function(){
-		//pasteCatcher.focus();
-		});
-	document.getElementById('paste_ff').addEventListener('DOMSubtreeModified',function(){
-		if(pasteCatcher.children.length == 1){
-			img = pasteCatcher.firstElementChild.src;
-            
-            var img2 = new Image();
-            img2.onload = function(){
-                ctx.drawImage(img2, 0, 0);
+        <button onclick="setBackgroundImage()">setBackgroundImage</button>
+        <button onclick="addRectangle()">addRectangle</button>
+        <button onclick="addTextBox()">addTextBox</button>
+        <button onclick="deleteObject()">deleteObject</button>
+
+        <button id="canvas2png">Canvas 2 PNG</button>
+        <canvas id="canvas" width="800" height="800"></canvas>
+
+
+
+
+        <script src="fabric.js"></script>
+        <script>
+            document.onkeydown = function (e) {
+                return on_keyboard_action(e);
+            }
+            document.onkeyup = function (e) {
+                return on_keyboardup_action(e);
+            }
+
+            var canvas = document.getElementById("canvas");
+            var ctx = canvas.getContext("2d");
+            var ctrl_pressed = false;
+
+            function on_keyboard_action(event) {
+                k = event.keyCode;
+                //ctrl
+                if (k == 17) {
+                    if (ctrl_pressed == false)
+                        ctrl_pressed = true;
+                    if (!window.Clipboard)
+                        pasteCatcher.focus();
                 }
-            img2.src = img;
-            //ctx.drawImage(img, 0, 0);
-         
-            
-            //ctx.drawImage(img, 0, 0);
-            //jatinder: don't empty paste catcher
-			//pasteCatcher.innerHTML = '';
-			}
-		},false);
-	}
-//chrome
-window.addEventListener("paste", pasteHandler);
-function pasteHandler(e){
-	if(e.clipboardData) {
-		var items = e.clipboardData.items;
-		if (items){
-			for (var i = 0; i < items.length; i++) {
-				if (items[i].type.indexOf("image") !== -1) {
-					var blob = items[i].getAsFile();
-					var URLObj = window.URL || window.webkitURL;
-					var source = URLObj.createObjectURL(blob);
-					paste_createImage(source);
-					}
-				}
-			}
-		// If we can't handle clipboard data directly (Firefox),
-		// we need to read what was pasted from the contenteditable element
-		else{
-			}
-		}
-	else{
-		setTimeout(paste_check_Input, 1);
-		}
-	}
-function paste_check_Input(){
-	var child = pasteCatcher.childNodes[0];
-	pasteCatcher.innerHTML = "";
-	if (child){
-		if (cild.tagName === "IMG"){
-			paste_createImage(child.src);
-			}
-		}
-	}
-function paste_createImage(source){
-	var pastedImage = new Image();
-	pastedImage.onload = function() {
-        ctx.drawImage(pastedImage, 0, 0);
-		}
-	pastedImage.src = source;
-	}
-
-//=== /Clipboard ===============================================================
-
-var canvas = new fabric.Canvas('canvas');
-
-function setBackgroundImage(){
-	var src = 'jail_cell_bars.png';
-	//var src = $("#paste_ff img").attr('src'); 
-	
-canvas.setBackgroundImage( src , canvas.renderAll.bind(canvas), {
-    backgroundImageOpacity: 0.5,
-    backgroundImageStretch: false
-});	
-
-	
-}
+            }
+            function on_keyboardup_action(event) {
+                //ctrl
+                if (k == 17)
+                    ctrl_pressed = false;
+            }
 
 
-function insertImageToBoard(){
-	var imgElement = document.getElementById('paste_ff');
-	console.log(imgElement);
-	var imgInstance = new fabric.Image(imgElement, {
-	  left: 100,
-	  top: 100,
-	  angle: 30,
-	  opacity: 0.85
-	});
-	canvas.add(imgInstance);
-}
+            //=== Clipboard ================================================================
 
-function addRectangle(){
- // create a rectangle with a fill and a different color stroke
-    var rect = new fabric.Rect({
-       left: 50,
-       top: 50,
-       width: 50,
-       height: 50,
-       fill: 'rgba(255,127,39,1)',
-       stroke: 'rgba(34,177,76,1)',
-       strokeWidth: 5
-    });
-    canvas.add(rect);
-    canvas.renderAll();  	
-}
+            //firefox
+            var pasteCatcher;
+            if (!window.Clipboard) {
+                pasteCatcher = document.createElement("div");
+                pasteCatcher.setAttribute("id", "paste_ff");
+                pasteCatcher.setAttribute("contenteditable", "");
+                pasteCatcher.style.cssText = 'opacity:0;position:fixed;top:0px;left:0px;';
+                pasteCatcher.style.marginLeft = "-20px";
+                document.body.appendChild(pasteCatcher);
+                pasteCatcher.focus();
+                document.addEventListener("click", function () {
+                    //pasteCatcher.focus();
+                });
+                document.getElementById('paste_ff').addEventListener('DOMSubtreeModified', function () {
+                    if (pasteCatcher.children.length == 1) {
+                        img = pasteCatcher.firstElementChild.src;
 
-function saveImgsaveImg(){    
-    console.log('export image');
-     if (!fabric.Canvas.supports('toDataURL')) {
-      alert('This browser doesn\'t provide means to serialize canvas to an image');
-    }
-    else {
-      window.open(canvas.toDataURL('png'));
-    }
-}
+                        var img2 = new Image();
+                        img2.onload = function () {
+                            ctx.drawImage(img2, 0, 0);
+                        }
+                        img2.src = img;
+                        //ctx.drawImage(img, 0, 0);
 
-$("#canvas2png").click(function(){
-    canvas.isDrawingMode = false;
 
-    if(!window.localStorage){alert("This function is not supported by your browser."); return;}
-    // to PNG
-    window.open(canvas.toDataURL('png'));
-});
+                        //ctx.drawImage(img, 0, 0);
+                        //jatinder: don't empty paste catcher
+                        //pasteCatcher.innerHTML = '';
+                    }
+                }, false);
+            }
+            //chrome
+            window.addEventListener("paste", pasteHandler);
+            function pasteHandler(e) {
+                if (e.clipboardData) {
+                    var items = e.clipboardData.items;
+                    if (items) {
+                        for (var i = 0; i < items.length; i++) {
+                            if (items[i].type.indexOf("image") !== -1) {
+                                var blob = items[i].getAsFile();
+                                var URLObj = window.URL || window.webkitURL;
+                                var source = URLObj.createObjectURL(blob);
+                                paste_createImage(source);
+                            }
+                        }
+                    }
+                    // If we can't handle clipboard data directly (Firefox),
+                    // we need to read what was pasted from the contenteditable element
+                    else {
+                    }
+                } else {
+                    setTimeout(paste_check_Input, 1);
+                }
+            }
+            function paste_check_Input() {
+                var child = pasteCatcher.childNodes[0];
+                pasteCatcher.innerHTML = "";
+                if (child) {
+                    if (cild.tagName === "IMG") {
+                        paste_createImage(child.src);
+                    }
+                }
+            }
+            function paste_createImage(source) {
+                var pastedImage = new Image();
+                pastedImage.onload = function () {
+                    ctx.drawImage(pastedImage, 0, 0);
+                }
+                pastedImage.src = source;
+            }
 
-    </script>
-</body>
+            //=== /Clipboard ===============================================================
+
+            var canvas = new fabric.Canvas('canvas');
+
+            function setBackgroundImage() {
+                var src = 'jail_cell_bars.png';
+                //var src = $("#paste_ff img").attr('src'); 
+
+                canvas.setBackgroundImage(src, canvas.renderAll.bind(canvas), {
+                    backgroundImageOpacity: 0.5,
+                    backgroundImageStretch: false
+                });
+
+
+            }
+
+
+            function insertImageToBoard() {
+                var imgElement = document.getElementById('paste_ff');
+                console.log(imgElement);
+                var imgInstance = new fabric.Image(imgElement, {
+                    left: 100,
+                    top: 100,
+                    angle: 30,
+                    opacity: 0.85
+                });
+                canvas.add(imgInstance);
+            }
+
+            function addRectangle() {
+                // create a rectangle with a fill and a different color stroke
+                var rect = new fabric.Rect({
+                    left: 50,
+                    top: 50,
+                    width: 50,
+                    height: 50,
+                    radius: 25,
+                    fill: 'transparent',
+                    hasBorders: true,
+                    borderColor: 'red',
+                    cornerColor: 'green',
+                    cornerSize: 6,
+                    transparentCorners: false,
+                    stroke: 'red',
+                    strokeWidth: 4
+                });
+                canvas.add(rect);
+                canvas.renderAll();
+            }
+
+            function saveImgsaveImg() {
+                console.log('export image');
+                if (!fabric.Canvas.supports('toDataURL')) {
+                    alert('This browser doesn\'t provide means to serialize canvas to an image');
+                } else {
+                    window.open(canvas.toDataURL('png'));
+                }
+            }
+
+            function addTextBox() {
+                var t1 = new fabric.Textbox('My Text', {
+                    width: 200,
+                    top: 5,
+                    left: 5,
+                    fontSize: 16,
+                    color: 'red',
+                    fill: 'red',
+                    textAlign: 'left',
+                    borderColor: 'red',
+                    cornerColor: 'green',
+                    cornerSize: 6,
+                    transparentCorners: false
+                });
+
+                canvas.add(t1);
+            }
+
+
+            $("#canvas2png").click(function () {
+                canvas.isDrawingMode = false;
+
+                if (!window.localStorage) {
+                    alert("This function is not supported by your browser.");
+                    return;
+                }
+                // to PNG
+                window.open(canvas.toDataURL('png'));
+            });
+            canvas.observe('object:modified', function (e) {
+                e.target.resizeToScale();
+            });
+
+            // customise fabric.Object with a method to resize rather than just scale after tranformation
+            fabric.Object.prototype.resizeToScale = function () {
+                // resizes an object that has been scaled (e.g. by manipulating the handles), setting scale to 1 and recalculating bounding box where necessary
+                switch (this.type) {
+                    case "circle":
+                        this.radius *= this.scaleX;
+                        this.scaleX = 1;
+                        this.scaleY = 1;
+                        break;
+                    case "ellipse":
+                        this.rx *= this.scaleX;
+                        this.ry *= this.scaleY;
+                        this.width = this.rx * 2;
+                        this.height = this.ry * 2;
+                        this.scaleX = 1;
+                        this.scaleY = 1;
+                        break;
+                    case "polygon":
+                    case "polyline":
+                        var points = this.get('points');
+                        for (var i = 0; i < points.length; i++) {
+                            var p = points[i];
+                            p.x *= this.scaleX
+                            p.y *= this.scaleY;
+                        }
+                        this.scaleX = 1;
+                        this.scaleY = 1;
+                        this.width = this.getBoundingBox().width;
+                        this.height = this.getBoundingBox().height;
+                        break;
+                    case "triangle":
+                    case "line":
+                    case "rect":
+                        this.width *= this.scaleX;
+                        this.height *= this.scaleY;
+                        this.scaleX = 1;
+                        this.scaleY = 1;
+                    default:
+                        break;
+                }
+            }
+
+            function deleteObject() {
+                canvas.getActiveObject().remove();
+            }
+        </script>
+    </body>
 </html>
